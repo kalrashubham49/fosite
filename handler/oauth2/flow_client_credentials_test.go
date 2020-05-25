@@ -30,8 +30,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/internal"
 )
 
 func TestClientCredentials_HandleTokenEndpointRequest(t *testing.T) {

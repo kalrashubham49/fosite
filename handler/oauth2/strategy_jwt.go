@@ -29,8 +29,8 @@ import (
 	jwtx "github.com/dgrijalva/jwt-go"
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/token/jwt"
 )
 
 // DefaultJWTStrategy is a JWT RS256 strategy.

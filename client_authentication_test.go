@@ -39,9 +39,9 @@ import (
 	"github.com/stretchr/testify/require"
 	jose "gopkg.in/square/go-jose.v2"
 
-	. "github.com/ory/fosite"
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/storage"
+	. "github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/internal"
+	"github.com/kalrashubham49/fosite/storage"
 )
 
 func mustGenerateAssertion(t *testing.T, claims jwt.MapClaims, key *rsa.PrivateKey, kid string) string {

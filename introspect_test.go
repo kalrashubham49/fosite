@@ -31,10 +31,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	. "github.com/ory/fosite"
-	"github.com/ory/fosite/compose"
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/storage"
+	. "github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/compose"
+	"github.com/kalrashubham49/fosite/internal"
+	"github.com/kalrashubham49/fosite/storage"
 )
 
 func TestAccessTokenFromRequestNoToken(t *testing.T) {

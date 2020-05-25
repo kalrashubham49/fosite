@@ -25,7 +25,7 @@ import (
 	"context"
 	"time"
 
-	"github.com/ory/fosite"
+	"github.com/kalrashubham49/fosite"
 )
 
 type HandleHelper struct {

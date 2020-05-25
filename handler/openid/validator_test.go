@@ -31,8 +31,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/token/jwt"
 )
 
 func TestValidatePrompt(t *testing.T) {

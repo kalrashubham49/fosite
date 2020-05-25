@@ -27,9 +27,9 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/handler/oauth2"
+	"github.com/kalrashubham49/fosite/token/jwt"
 )
 
 type OpenIDConnectImplicitHandler struct {
