@@ -34,7 +34,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
+	"github.com/kalrashubham49/fosite"
 )
 
 // HMACStrategy is responsible for generating and validating challenges.

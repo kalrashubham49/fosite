@@ -27,7 +27,7 @@ import (
 	"crypto/sha256"
 	"encoding/base64"
 
-	"github.com/ory/fosite"
+	"github.com/kalrashubham49/fosite"
 )
 
 type IDTokenHandleHelper struct {

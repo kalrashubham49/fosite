@@ -31,12 +31,12 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/handler/oauth2"
-	"github.com/ory/fosite/internal"
-	"github.com/ory/fosite/storage"
-	"github.com/ory/fosite/token/hmac"
-	"github.com/ory/fosite/token/jwt"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/handler/oauth2"
+	"github.com/kalrashubham49/fosite/internal"
+	"github.com/kalrashubham49/fosite/storage"
+	"github.com/kalrashubham49/fosite/token/hmac"
+	"github.com/kalrashubham49/fosite/token/jwt"
 )
 
 var idStrategy = &DefaultStrategy{

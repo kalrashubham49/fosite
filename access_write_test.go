@@ -28,8 +28,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 
-	. "github.com/ory/fosite"
-	. "github.com/ory/fosite/internal"
+	. "github.com/kalrashubham49/fosite"
+	. "github.com/kalrashubham49/fosite/internal"
 )
 
 func TestWriteAccessResponse(t *testing.T) {

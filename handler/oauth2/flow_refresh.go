@@ -27,11 +27,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/ory/fosite/storage"
+	"github.com/kalrashubham49/fosite/storage"
 
 	"github.com/pkg/errors"
 
-	"github.com/ory/fosite"
+	"github.com/kalrashubham49/fosite"
 )
 
 type RefreshTokenGrantHandler struct {

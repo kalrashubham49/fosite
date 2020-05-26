@@ -29,8 +29,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/ory/fosite"
-	"github.com/ory/fosite/token/hmac"
+	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/token/hmac"
 )
 
 var hmacshaStrategy = HMACSHAStrategy{
