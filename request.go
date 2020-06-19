@@ -39,6 +39,7 @@ type Request struct {
 	Session           Session    `json:"session" gorethink:"session"`
 	RequestedAudience Arguments  `json:"requestedAudience"`
 	GrantedAudience   Arguments  `json:"grantedAudience"`
+	Signature         string     `json:"signature"`
 }
 
 func NewRequest() *Request {
