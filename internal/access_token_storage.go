@@ -65,9 +65,9 @@ func (mr *MockAccessTokenStorageMockRecorder) DeleteAccessTokenSession(arg0, arg
 }
 
 // GetAccessTokenSession mocks base method
-func (m *MockAccessTokenStorage) GetAccessTokenSession(arg0 context.Context, arg1 string, arg2 fosite.Session) (fosite.Requester, error) {
+func (m *MockAccessTokenStorage) GetAccessTokenSession(arg0 context.Context, arg1 string) (fosite.Requester, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccessTokenSession", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetAccessTokenSession", arg0, arg1)
 	ret0, _ := ret[0].(fosite.Requester)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1

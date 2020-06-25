@@ -309,7 +309,7 @@ func TestRefreshFlow_PopulateTokenEndpointResponse(t *testing.T) {
 						signature := strategy.RefreshTokenSignature(areq.Form.Get("refresh_token"))
 
 						// The old refresh token should be deleted
-						_, err := store.GetRefreshTokenSession(nil, signature, nil)
+						_, err := store.GetRefreshTokenSession(nil, signature)
 						require.Error(t, err)
 
 						assert.Equal(t, "req-id", areq.ID)
@@ -374,7 +374,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -415,7 +415,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(nil, errors.New("Whoops, a nasty database error occurred!")).
 					Times(1)
 				mockTransactional.
@@ -438,7 +438,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(nil, fosite.ErrNotFound).
 					Times(1)
 				mockTransactional.
@@ -460,7 +460,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -488,7 +488,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -515,7 +515,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -548,7 +548,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -580,7 +580,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -616,7 +616,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -653,7 +653,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -696,7 +696,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -750,7 +750,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(nil, fosite.ErrNotFound).
 					Times(1)
 				mockTransactional.
@@ -772,7 +772,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.
@@ -815,7 +815,7 @@ func TestRefreshFlowTransactional_PopulateTokenEndpointResponse(t *testing.T) {
 					Times(1)
 				mockRevocationStore.
 					EXPECT().
-					GetRefreshTokenSession(propagatedContext, gomock.Any(), nil).
+					GetRefreshTokenSession(propagatedContext, gomock.Any()).
 					Return(request, nil).
 					Times(1)
 				mockRevocationStore.

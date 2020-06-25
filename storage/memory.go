@@ -208,7 +208,7 @@ func (s *MemoryStore) CreateAccessTokenSession(_ context.Context, signature stri
 	return nil
 }
 
-func (s *MemoryStore) GetAccessTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
+func (s *MemoryStore) GetAccessTokenSession(_ context.Context, signature string) (fosite.Requester, error) {
 	rel, ok := s.AccessTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound
@@ -227,7 +227,7 @@ func (s *MemoryStore) CreateRefreshTokenSession(_ context.Context, signature str
 	return nil
 }
 
-func (s *MemoryStore) GetRefreshTokenSession(_ context.Context, signature string, _ fosite.Session) (fosite.Requester, error) {
+func (s *MemoryStore) GetRefreshTokenSession(_ context.Context, signature string) (fosite.Requester, error) {
 	rel, ok := s.RefreshTokens[signature]
 	if !ok {
 		return nil, fosite.ErrNotFound

@@ -80,7 +80,7 @@ func matchScopes(ss fosite.ScopeStrategy, granted, scopes []string) error {
 
 func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
 	sig := c.CoreStrategy.AccessTokenSignature(token)
-	or, err := c.CoreStorage.GetAccessTokenSession(ctx, sig, accessRequest.GetSession())
+	or, err := c.CoreStorage.GetAccessTokenSession(ctx, sig)
 	if err != nil {
 		return errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug(err.Error()))
 	} else if err := c.CoreStrategy.ValidateAccessToken(ctx, or, token); err != nil {
@@ -97,7 +97,7 @@ func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string,
 
 func (c *CoreValidator) introspectRefreshToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
 	sig := c.CoreStrategy.RefreshTokenSignature(token)
-	or, err := c.CoreStorage.GetRefreshTokenSession(ctx, sig, accessRequest.GetSession())
+	or, err := c.CoreStorage.GetRefreshTokenSession(ctx, sig)
 
 	if err != nil {
 		return errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug(err.Error()))

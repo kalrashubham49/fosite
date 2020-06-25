@@ -63,7 +63,7 @@ func (c *RefreshTokenGrantHandler) HandleTokenEndpointRequest(ctx context.Contex
 
 	refresh := request.GetRequestForm().Get("refresh_token")
 	signature := c.RefreshTokenStrategy.RefreshTokenSignature(refresh)
-	originalRequest, err := c.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature, request.GetSession())
+	originalRequest, err := c.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature)
 	if errors.Cause(err) == fosite.ErrNotFound {
 		return errors.WithStack(fosite.ErrInvalidGrant.WithDebugf("The refresh token has not been found: %s", err))
 	} else if err != nil {
@@ -136,7 +136,7 @@ func (c *RefreshTokenGrantHandler) PopulateTokenEndpointResponse(ctx context.Con
 		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
 	}
 
-	ts, err := c.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature, nil)
+	ts, err := c.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature)
 	if err != nil {
 		return handleRefreshTokenEndpointResponseStorageError(ctx, true, c.TokenRevocationStorage, err)
 	} else if err := c.TokenRevocationStorage.RevokeAccessToken(ctx, ts.GetID()); err != nil {

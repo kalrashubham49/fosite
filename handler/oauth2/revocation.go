@@ -42,12 +42,12 @@ func (r *TokenRevocationHandler) RevokeToken(ctx context.Context, token string, 
 		func() (request fosite.Requester, err error) {
 			// Refresh token
 			signature := r.RefreshTokenStrategy.RefreshTokenSignature(token)
-			return r.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature, nil)
+			return r.TokenRevocationStorage.GetRefreshTokenSession(ctx, signature)
 		},
 		func() (request fosite.Requester, err error) {
 			// Access token
 			signature := r.AccessTokenStrategy.AccessTokenSignature(token)
-			return r.TokenRevocationStorage.GetAccessTokenSession(ctx, signature, nil)
+			return r.TokenRevocationStorage.GetAccessTokenSession(ctx, signature)
 		},
 	}
 

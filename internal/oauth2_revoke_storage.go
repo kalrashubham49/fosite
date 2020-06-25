@@ -93,33 +93,33 @@ func (mr *MockTokenRevocationStorageMockRecorder) DeleteRefreshTokenSession(arg0
 }
 
 // GetAccessTokenSession mocks base method
-func (m *MockTokenRevocationStorage) GetAccessTokenSession(arg0 context.Context, arg1 string, arg2 fosite.Session) (fosite.Requester, error) {
+func (m *MockTokenRevocationStorage) GetAccessTokenSession(arg0 context.Context, arg1 string) (fosite.Requester, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccessTokenSession", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetAccessTokenSession", arg0, arg1)
 	ret0, _ := ret[0].(fosite.Requester)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetAccessTokenSession indicates an expected call of GetAccessTokenSession
-func (mr *MockTokenRevocationStorageMockRecorder) GetAccessTokenSession(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockTokenRevocationStorageMockRecorder) GetAccessTokenSession(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccessTokenSession", reflect.TypeOf((*MockTokenRevocationStorage)(nil).GetAccessTokenSession), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccessTokenSession", reflect.TypeOf((*MockTokenRevocationStorage)(nil).GetAccessTokenSession), arg0, arg1)
 }
 
 // GetRefreshTokenSession mocks base method
-func (m *MockTokenRevocationStorage) GetRefreshTokenSession(arg0 context.Context, arg1 string, arg2 fosite.Session) (fosite.Requester, error) {
+func (m *MockTokenRevocationStorage) GetRefreshTokenSession(arg0 context.Context, arg1 string) (fosite.Requester, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetRefreshTokenSession", arg0, arg1, arg2)
+	ret := m.ctrl.Call(m, "GetRefreshTokenSession", arg0, arg1)
 	ret0, _ := ret[0].(fosite.Requester)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // GetRefreshTokenSession indicates an expected call of GetRefreshTokenSession
-func (mr *MockTokenRevocationStorageMockRecorder) GetRefreshTokenSession(arg0, arg1, arg2 interface{}) *gomock.Call {
+func (mr *MockTokenRevocationStorageMockRecorder) GetRefreshTokenSession(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRefreshTokenSession", reflect.TypeOf((*MockTokenRevocationStorage)(nil).GetRefreshTokenSession), arg0, arg1, arg2)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetRefreshTokenSession", reflect.TypeOf((*MockTokenRevocationStorage)(nil).GetRefreshTokenSession), arg0, arg1)
 }
 
 // RevokeAccessToken mocks base method
