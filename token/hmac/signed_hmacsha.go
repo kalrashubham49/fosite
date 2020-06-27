@@ -27,7 +27,6 @@ type HMACStrategy struct {
 // Generate generates a token and a matching signature or returns an error.
 // This method implements rfc6819 Section 5.1.4.2.2: Use High Entropy for Secrets.
 func (c *HMACStrategy) Generate() (string, string, error) {
-
 	c.Lock()
 	defer c.Unlock()
 
