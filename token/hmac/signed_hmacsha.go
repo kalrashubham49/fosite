@@ -16,7 +16,7 @@ import (
 )
 
 // HMACStrategy is responsible for generating and validating challenges.
-type SignedHMACStrategy struct {
+type HMACStrategy struct {
 	TokenEntropy         int
 	GlobalSecret         []byte
 	RotatedGlobalSecrets [][]byte
@@ -26,9 +26,14 @@ type SignedHMACStrategy struct {
 
 // Generate generates a token and a matching signature or returns an error.
 // This method implements rfc6819 Section 5.1.4.2.2: Use High Entropy for Secrets.
-func (c *SignedHMACStrategy) Generate() (string, string, error) {
+func (c *HMACStrategy) Generate() (string, string, error) {
+
 	c.Lock()
 	defer c.Unlock()
+
+	if c.PrivateKey == nil {
+		return "", "", errors.Errorf("No Private Key Found")
+	}
 
 	if len(c.GlobalSecret) < minimumSecretLength {
 		return "", "", errors.Errorf("secret for signing HMAC-SHA256 is expected to be 32 byte long, got %d byte", len(c.GlobalSecret))
@@ -75,7 +80,7 @@ func (c *SignedHMACStrategy) Generate() (string, string, error) {
 }
 
 // Validate validates a token and returns its signature or an error if the token is not valid.
-func (c *SignedHMACStrategy) Validate(token string) (err error) {
+func (c *HMACStrategy) Validate(token string) (err error) {
 	var keys [][]byte
 
 	if len(c.GlobalSecret) > 0 {
@@ -102,7 +107,7 @@ func (c *SignedHMACStrategy) Validate(token string) (err error) {
 	return err
 }
 
-func (c *SignedHMACStrategy) validate(secret []byte, token string) error {
+func (c *HMACStrategy) validate(secret []byte, token string) error {
 
 	if len(secret) < minimumSecretLength {
 		return errors.Errorf("secret for signing HMAC-SHA256 is expected to be 32 byte long, got %d byte", len(secret))
@@ -128,26 +133,26 @@ func (c *SignedHMACStrategy) validate(secret []byte, token string) error {
 		return errors.WithStack(err)
 	}
 
-	decodedTokenKey, err := b64.DecodeString(tokenKey)
-	if err != nil {
-		return errors.WithStack(err)
-	}
-
 	return signingutils.VerifySigning(&c.PrivateKey.PublicKey, token, decodedTokenSignature)
 
-	// CHECK WITH LOKESH SIR======================
-	// TODO: If verifier successfuly , do we still need to generate HMAC anc Check
-	expectedMAC := generateHMAC(decodedTokenKey, &signingKey)
-	if !hmac.Equal(expectedMAC, decodedTokenSignature) {
-		// Hash is invalid
-		return errors.WithStack(fosite.ErrTokenSignatureMismatch)
-	}
+	// decodedTokenKey, err := b64.DecodeString(tokenKey)
+	// if err != nil {
+	// 	return errors.WithStack(err)
+	// }
 
-	return nil
+	// // CHECK WITH LOKESH SIR======================
+	// // TODO: If verifier successfuly , do we still need to generate HMAC anc Check
+	// expectedMAC := generateHMAC(decodedTokenKey, &signingKey)
+	// if !hmac.Equal(expectedMAC, decodedTokenSignature) {
+	// 	// Hash is invalid
+	// 	return errors.WithStack(fosite.ErrTokenSignatureMismatch)
+	// }
+
+	// return nil
 }
 
 //Signature - Return Signature Out of HmacToken
-func (c *SignedHMACStrategy) Signature(token string) string {
+func (c *HMACStrategy) Signature(token string) string {
 	split := strings.Split(token, ".")
 	// Changed Characters Limit to 3 , As we have added Expiry Time to Encoded Key
 	if len(split) != 2 {
@@ -157,7 +162,7 @@ func (c *SignedHMACStrategy) Signature(token string) string {
 }
 
 //Valid - Check for Expiry of HMAC Token
-func (c *SignedHMACStrategy) Valid(token string) bool {
+func (c *HMACStrategy) Valid(token string) bool {
 	expiry, err := c.GetExpirationTime(token)
 	if err != nil {
 		return false
@@ -170,7 +175,7 @@ func (c *SignedHMACStrategy) Valid(token string) bool {
 }
 
 //GetExpirationTime -  Get Expiration Time from Token in UTC
-func (c *SignedHMACStrategy) GetExpirationTime(token string) (time.Time, error) {
+func (c *HMACStrategy) GetExpirationTime(token string) (time.Time, error) {
 
 	components := strings.Split(token, ".")
 	if len(components) != 2 {

@@ -53,6 +53,18 @@ func (h HMACSHAStrategy) GenerateAccessToken(_ context.Context, _ fosite.Request
 }
 
 func (h HMACSHAStrategy) ValidateAccessToken(_ context.Context, r fosite.Requester, token string) (err error) {
+
+	err = h.Enigma.Validate(token)
+	if err != nil { // Validation Error
+		return err
+	}
+
+	// Check for Expiry
+	isExpired := h.Enigma.Valid(token)
+	if isExpired == true {
+		return errors.New("Token Expired")
+	}
+
 	var exp = r.GetSession().GetExpiresAt(fosite.AccessToken)
 	if exp.IsZero() && r.GetRequestedAt().Add(h.AccessTokenLifespan).Before(time.Now().UTC()) {
 		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at \"%s\".", r.GetRequestedAt().Add(h.AccessTokenLifespan)))
@@ -60,7 +72,6 @@ func (h HMACSHAStrategy) ValidateAccessToken(_ context.Context, r fosite.Request
 	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
 		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at \"%s\".", exp))
 	}
-	return h.Enigma.Validate(token)
 }
 
 func (h HMACSHAStrategy) GenerateRefreshToken(_ context.Context, _ fosite.Requester) (token string, signature string, err error) {
@@ -77,6 +88,7 @@ func (h HMACSHAStrategy) ValidateRefreshToken(_ context.Context, r fosite.Reques
 		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Refresh token expired at \"%s\".", exp))
 	}
 	return h.Enigma.Validate(token)
+
 }
 
 func (h HMACSHAStrategy) GenerateAuthorizeCode(_ context.Context, _ fosite.Requester) (token string, signature string, err error) {

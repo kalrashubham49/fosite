@@ -37,8 +37,8 @@ import (
 	"github.com/kalrashubham49/fosite"
 )
 
-// HMACStrategy is responsible for generating and validating challenges.
-type HMACStrategy struct {
+// OldHMACStrategy is responsible for generating and validating challenges.
+type OldHMACStrategy struct {
 	TokenEntropy         int
 	GlobalSecret         []byte
 	RotatedGlobalSecrets [][]byte
@@ -57,7 +57,7 @@ var b64 = base64.URLEncoding.WithPadding(base64.NoPadding)
 
 // Generate generates a token and a matching signature or returns an error.
 // This method implements rfc6819 Section 5.1.4.2.2: Use High Entropy for Secrets.
-func (c *HMACStrategy) Generate() (string, string, error) {
+func (c *OldHMACStrategy) Generate() (string, string, error) {
 	c.Lock()
 	defer c.Unlock()
 
@@ -92,7 +92,7 @@ func (c *HMACStrategy) Generate() (string, string, error) {
 }
 
 // Validate validates a token and returns its signature or an error if the token is not valid.
-func (c *HMACStrategy) Validate(token string) (err error) {
+func (c *OldHMACStrategy) Validate(token string) (err error) {
 	var keys [][]byte
 
 	if len(c.GlobalSecret) > 0 {
@@ -119,7 +119,7 @@ func (c *HMACStrategy) Validate(token string) (err error) {
 	return err
 }
 
-func (c *HMACStrategy) validate(secret []byte, token string) error {
+func (c *OldHMACStrategy) validate(secret []byte, token string) error {
 	if len(secret) < minimumSecretLength {
 		return errors.Errorf("secret for signing HMAC-SHA256 is expected to be 32 byte long, got %d byte", len(secret))
 	}
@@ -157,7 +157,7 @@ func (c *HMACStrategy) validate(secret []byte, token string) error {
 	return nil
 }
 
-func (c *HMACStrategy) Signature(token string) string {
+func (c *OldHMACStrategy) Signature(token string) string {
 	split := strings.Split(token, ".")
 
 	if len(split) != 2 {
