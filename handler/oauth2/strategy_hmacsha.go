@@ -72,6 +72,7 @@ func (h HMACSHAStrategy) ValidateAccessToken(_ context.Context, r fosite.Request
 	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
 		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at \"%s\".", exp))
 	}
+
 	return nil
 }
 
@@ -104,6 +105,112 @@ func (h HMACSHAStrategy) ValidateAuthorizeCode(_ context.Context, r fosite.Reque
 	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
 		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", exp))
 	}
+	return h.Enigma.Validate(token)
+}
 
+func (h HMACSHAStrategy) AuthorizeHmacSignatute(token string) string {
+	return h.Enigma.Signature(token)
+}
+func (h HMACSHAStrategy) GenerateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
+	return h.Enigma.Generate()
+}
+func (h HMACSHAStrategy) ValidateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester, token string) (err error) {
+	var exp = requester.GetSession().GetExpiresAt(fosite.AuthorizeCode)
+	if exp.IsZero() && requester.GetRequestedAt().Add(h.AuthorizeCodeLifespan).Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", requester.GetRequestedAt().Add(h.AuthorizeCodeLifespan)))
+	}
+	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", exp))
+	}
+	return h.Enigma.Validate(token)
+}
+
+type HMACSHAStrategyWithoutSigning struct {
+	Enigma                *enigma.OldHMACStrategy
+	AccessTokenLifespan   time.Duration
+	RefreshTokenLifespan  time.Duration
+	AuthorizeCodeLifespan time.Duration
+}
+
+func (h HMACSHAStrategyWithoutSigning) AccessTokenSignature(token string) string {
+	return h.Enigma.Signature(token)
+}
+func (h HMACSHAStrategyWithoutSigning) RefreshTokenSignature(token string) string {
+	return h.Enigma.Signature(token)
+}
+func (h HMACSHAStrategyWithoutSigning) AuthorizeCodeSignature(token string) string {
+	return h.Enigma.Signature(token)
+}
+
+func (h HMACSHAStrategyWithoutSigning) GenerateAccessToken(_ context.Context, _ fosite.Requester) (token string, signature string, err error) {
+	return h.Enigma.Generate()
+}
+
+func (h HMACSHAStrategyWithoutSigning) ValidateAccessToken(_ context.Context, r fosite.Requester, token string) (err error) {
+
+	err = h.Enigma.Validate(token)
+	if err != nil { // Validation Error
+		return err
+	}
+
+	// Check for Expiry
+	var exp = r.GetSession().GetExpiresAt(fosite.AccessToken)
+	if exp.IsZero() && r.GetRequestedAt().Add(h.AccessTokenLifespan).Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at \"%s\".", r.GetRequestedAt().Add(h.AccessTokenLifespan)))
+	}
+	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Access token expired at \"%s\".", exp))
+	}
+
+	return nil
+}
+
+func (h HMACSHAStrategyWithoutSigning) GenerateRefreshToken(_ context.Context, _ fosite.Requester) (token string, signature string, err error) {
+	return h.Enigma.Generate()
+}
+
+func (h HMACSHAStrategyWithoutSigning) ValidateRefreshToken(_ context.Context, r fosite.Requester, token string) (err error) {
+	var exp = r.GetSession().GetExpiresAt(fosite.RefreshToken)
+	if exp.IsZero() {
+		// Unlimited lifetime
+		return h.Enigma.Validate(token)
+	}
+	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Refresh token expired at \"%s\".", exp))
+	}
+	return h.Enigma.Validate(token)
+
+}
+
+func (h HMACSHAStrategyWithoutSigning) GenerateAuthorizeCode(_ context.Context, _ fosite.Requester) (token string, signature string, err error) {
+	return h.Enigma.Generate()
+}
+
+func (h HMACSHAStrategyWithoutSigning) ValidateAuthorizeCode(_ context.Context, r fosite.Requester, token string) (err error) {
+	var exp = r.GetSession().GetExpiresAt(fosite.AuthorizeCode)
+	if exp.IsZero() && r.GetRequestedAt().Add(h.AuthorizeCodeLifespan).Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", r.GetRequestedAt().Add(h.AuthorizeCodeLifespan)))
+	}
+	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", exp))
+	}
+
+	return h.Enigma.Validate(token)
+}
+
+func (h HMACSHAStrategyWithoutSigning) AuthorizeHmacSignatute(token string) string {
+	return h.Enigma.Signature(token)
+}
+func (h HMACSHAStrategyWithoutSigning) GenerateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error) {
+	return h.Enigma.Generate()
+}
+func (h HMACSHAStrategyWithoutSigning) ValidateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester, token string) (err error) {
+	var exp = requester.GetSession().GetExpiresAt(fosite.AuthorizeCode)
+	if exp.IsZero() && requester.GetRequestedAt().Add(h.AuthorizeCodeLifespan).Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", requester.GetRequestedAt().Add(h.AuthorizeCodeLifespan)))
+	}
+	if !exp.IsZero() && exp.Before(time.Now().UTC()) {
+		return errors.WithStack(fosite.ErrTokenExpired.WithHintf("Authorize code expired at \"%s\".", exp))
+	}
 	return h.Enigma.Validate(token)
 }

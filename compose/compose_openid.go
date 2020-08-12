@@ -35,7 +35,10 @@ func OpenIDConnectExplicitFactory(config *Config, storage interface{}, strategy 
 		OpenIDConnectRequestStorage: storage.(openid.OpenIDConnectRequestStorage),
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
 			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			Storage:         storage.(openid.OpenIDConnectRequestStorage),
+			IDTokenLifeSpan: config.GetIDTokenLifespan(),
 		},
+
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(config.AllowedPromptValues, strategy.(jwt.JWTStrategy)),
 	}
 }
@@ -47,6 +50,8 @@ func OpenIDConnectRefreshFactory(config *Config, storage interface{}, strategy i
 	return &openid.OpenIDConnectRefreshHandler{
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
 			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			Storage:         storage.(openid.OpenIDConnectRequestStorage),
+			IDTokenLifeSpan: config.GetIDTokenLifespan(),
 		},
 	}
 }
@@ -64,7 +69,10 @@ func OpenIDConnectImplicitFactory(config *Config, storage interface{}, strategy 
 		ScopeStrategy: config.GetScopeStrategy(),
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
 			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			Storage:         storage.(openid.OpenIDConnectRequestStorage),
+			IDTokenLifeSpan: config.GetIDTokenLifespan(),
 		},
+
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(config.AllowedPromptValues, strategy.(jwt.JWTStrategy)),
 	}
 }
@@ -77,7 +85,7 @@ func OpenIDConnectHybridFactory(config *Config, storage interface{}, strategy in
 		AuthorizeExplicitGrantHandler: &oauth2.AuthorizeExplicitGrantHandler{
 			AccessTokenStrategy:   strategy.(oauth2.AccessTokenStrategy),
 			RefreshTokenStrategy:  strategy.(oauth2.RefreshTokenStrategy),
-			AuthorizeCodeStrategy: strategy.(oauth2.AuthorizeCodeStrategy),
+			AuthorizeHmacStrategy: strategy.(oauth2.AuthorizeHmacStrategy),
 			CoreStorage:           storage.(oauth2.CoreStorage),
 			AuthCodeLifespan:      config.GetAuthorizeCodeLifespan(),
 			AccessTokenLifespan:   config.GetAccessTokenLifespan(),
@@ -92,6 +100,8 @@ func OpenIDConnectHybridFactory(config *Config, storage interface{}, strategy in
 		},
 		IDTokenHandleHelper: &openid.IDTokenHandleHelper{
 			IDTokenStrategy: strategy.(openid.OpenIDConnectTokenStrategy),
+			Storage:         storage.(openid.OpenIDConnectRequestStorage),
+			IDTokenLifeSpan: config.GetIDTokenLifespan(),
 		},
 		OpenIDConnectRequestStorage:   storage.(openid.OpenIDConnectRequestStorage),
 		OpenIDConnectRequestValidator: openid.NewOpenIDConnectRequestValidator(config.AllowedPromptValues, strategy.(jwt.JWTStrategy)),

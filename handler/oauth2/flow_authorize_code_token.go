@@ -46,7 +46,7 @@ func (c *AuthorizeExplicitGrantHandler) HandleTokenEndpointRequest(ctx context.C
 	}
 
 	code := request.GetRequestForm().Get("code")
-	signature := c.AuthorizeCodeStrategy.AuthorizeCodeSignature(code)
+	signature := c.AuthorizeHmacStrategy.AuthorizeHmacSignatute(code)
 	authorizeRequest, err := c.CoreStorage.GetAuthorizeCodeSession(ctx, signature, request.GetSession())
 	if errors.Cause(err) == fosite.ErrInvalidatedAuthorizeCode {
 		if authorizeRequest == nil {
@@ -71,12 +71,11 @@ func (c *AuthorizeExplicitGrantHandler) HandleTokenEndpointRequest(ctx context.C
 	} else if err != nil && errors.Cause(err).Error() == fosite.ErrNotFound.Error() {
 		return errors.WithStack(fosite.ErrInvalidGrant.WithDebug(err.Error()))
 	} else if err != nil {
-		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
+		return errors.WithStack(fosite.ErrInvalidGrant.WithHint(err.Error()).WithDebug(""))
 	}
-
 	// The authorization server MUST verify that the authorization code is valid
 	// This needs to happen after store retrieval for the session to be hydrated properly
-	if err := c.AuthorizeCodeStrategy.ValidateAuthorizeCode(ctx, request, code); err != nil {
+	if err := c.AuthorizeHmacStrategy.ValidateAuthorizeHmacCode(ctx, request, code); err != nil {
 		return errors.WithStack(fosite.ErrInvalidGrant.WithDebug(err.Error()))
 	}
 
@@ -138,11 +137,11 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	}
 
 	code := requester.GetRequestForm().Get("code")
-	signature := c.AuthorizeCodeStrategy.AuthorizeCodeSignature(code)
+	signature := c.AuthorizeHmacStrategy.AuthorizeHmacSignatute(code)
 	authorizeRequest, err := c.CoreStorage.GetAuthorizeCodeSession(ctx, signature, requester.GetSession())
 	if err != nil {
 		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
-	} else if err := c.AuthorizeCodeStrategy.ValidateAuthorizeCode(ctx, requester, code); err != nil {
+	} else if err := c.AuthorizeHmacStrategy.ValidateAuthorizeHmacCode(ctx, requester, code); err != nil {
 		// This needs to happen after store retrieval for the session to be hydrated properly
 		return errors.WithStack(fosite.ErrInvalidRequest.WithDebug(err.Error()))
 	}
@@ -155,7 +154,9 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 		requester.GrantAudience(audience)
 	}
 
-	access, accessSignature, err := c.AccessTokenStrategy.GenerateAccessToken(ctx, requester)
+	var access, accessSignature string
+
+	access, accessSignature, err = c.AccessTokenStrategy.GenerateAccessToken(ctx, requester)
 	if err != nil {
 		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
 	}
@@ -164,6 +165,7 @@ func (c *AuthorizeExplicitGrantHandler) PopulateTokenEndpointResponse(ctx contex
 	if canIssueRefreshToken(c, authorizeRequest) {
 		refresh, refreshSignature, err = c.RefreshTokenStrategy.GenerateRefreshToken(ctx, requester)
 		if err != nil {
+
 			return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
 		}
 	}

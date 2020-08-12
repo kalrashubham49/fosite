@@ -23,21 +23,24 @@ package oauth2
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
 
 	"github.com/kalrashubham49/fosite"
+	"github.com/kalrashubham49/fosite/customopenid"
 )
 
 type ClientCredentialsGrantHandler struct {
 	*HandleHelper
 	ScopeStrategy            fosite.ScopeStrategy
 	AudienceMatchingStrategy fosite.AudienceMatchingStrategy
+	*customopenid.IDTokenHandleHelper
 }
 
 // IntrospectTokenEndpointRequest implements https://tools.ietf.org/html/rfc6749#section-4.4.2
-func (c *ClientCredentialsGrantHandler) HandleTokenEndpointRequest(_ context.Context, request fosite.AccessRequester) error {
+func (c *ClientCredentialsGrantHandler) HandleTokenEndpointRequest(ctx context.Context, request fosite.AccessRequester) error {
 	// grant_type REQUIRED.
 	// Value MUST be set to "client_credentials".
 	if !request.GetGrantTypes().ExactOne("client_credentials") {
@@ -61,9 +64,11 @@ func (c *ClientCredentialsGrantHandler) HandleTokenEndpointRequest(_ context.Con
 	if client.IsPublic() {
 		return errors.WithStack(fosite.ErrInvalidGrant.WithHint("The OAuth 2.0 Client is marked as public and is thus not allowed to use authorization grant \"client_credentials\"."))
 	}
-	// if the client is not public, he has already been authenticated by the access request handler.
 
+	// if the client is not public, he has already been authenticated by the access request handler.
 	request.GetSession().SetExpiresAt(fosite.AccessToken, time.Now().UTC().Add(c.AccessTokenLifespan))
+	request.GetSession().SetExpiresAt(fosite.IDToken, time.Now().UTC().Add(c.IDTokenLifeSpan))
+
 	return nil
 }
 
@@ -77,5 +82,12 @@ func (c *ClientCredentialsGrantHandler) PopulateTokenEndpointResponse(ctx contex
 		return errors.WithStack(fosite.ErrInvalidGrant.WithHint("The OAuth 2.0 Client is not allowed to use authorization grant \"client_credentials\"."))
 	}
 
-	return c.IssueAccessToken(ctx, request, response)
+	c.IssueAccessToken(ctx, request, response)
+	fmt.Println(response)
+
+	c.IssueIDToken(ctx, request, response)
+	fmt.Println(response)
+
+	return nil
+
 }

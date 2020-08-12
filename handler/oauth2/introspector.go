@@ -25,6 +25,7 @@ import (
 	"context"
 
 	"github.com/pkg/errors"
+	"ramblify.com/tokenservice/core/utils"
 
 	"github.com/kalrashubham49/fosite"
 )
@@ -80,6 +81,15 @@ func matchScopes(ss fosite.ScopeStrategy, granted, scopes []string) error {
 
 func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
 	sig := c.CoreStrategy.AccessTokenSignature(token)
+
+	// Validate
+
+	err := utils.IsSignatureRevoked(sig, 1)
+
+	if err != nil {
+		return errors.WithStack(errors.New("Token is Already Revoked"))
+	}
+
 	or, err := c.CoreStorage.GetAccessTokenSession(ctx, sig)
 	if err != nil {
 		return errors.WithStack(fosite.ErrRequestUnauthorized.WithDebug(err.Error()))
@@ -96,7 +106,15 @@ func (c *CoreValidator) introspectAccessToken(ctx context.Context, token string,
 }
 
 func (c *CoreValidator) introspectRefreshToken(ctx context.Context, token string, accessRequest fosite.AccessRequester, scopes []string) error {
+
 	sig := c.CoreStrategy.RefreshTokenSignature(token)
+
+	err := utils.IsSignatureRevoked(sig, 2)
+
+	if err != nil {
+		return errors.WithStack(errors.New("Token is Already Revoked"))
+	}
+
 	or, err := c.CoreStorage.GetRefreshTokenSession(ctx, sig)
 
 	if err != nil {

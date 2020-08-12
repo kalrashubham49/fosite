@@ -37,7 +37,7 @@ import (
 type AuthorizeExplicitGrantHandler struct {
 	AccessTokenStrategy   AccessTokenStrategy
 	RefreshTokenStrategy  RefreshTokenStrategy
-	AuthorizeCodeStrategy AuthorizeCodeStrategy
+	AuthorizeHmacStrategy AuthorizeHmacStrategy
 	CoreStorage           CoreStorage
 	//TokenRevocationStorage TokenRevocationStorage
 
@@ -101,7 +101,7 @@ func (c *AuthorizeExplicitGrantHandler) HandleAuthorizeEndpointRequest(ctx conte
 }
 
 func (c *AuthorizeExplicitGrantHandler) IssueAuthorizeCode(ctx context.Context, ar fosite.AuthorizeRequester, resp fosite.AuthorizeResponder) error {
-	code, signature, err := c.AuthorizeCodeStrategy.GenerateAuthorizeCode(ctx, ar)
+	code, signature, err := c.AuthorizeHmacStrategy.GenerateAuthorizeHmacCode(ctx, ar)
 	if err != nil {
 		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
 	}

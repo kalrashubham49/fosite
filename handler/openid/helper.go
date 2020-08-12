@@ -26,12 +26,15 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/base64"
+	"time"
 
 	"github.com/kalrashubham49/fosite"
 )
 
 type IDTokenHandleHelper struct {
 	IDTokenStrategy OpenIDConnectTokenStrategy
+	Storage         OpenIDConnectRequestStorage
+	IDTokenLifeSpan time.Duration
 }
 
 func (i *IDTokenHandleHelper) GetAccessTokenHash(ctx context.Context, requester fosite.AccessRequester, responder fosite.AccessResponder) string {
@@ -46,18 +49,23 @@ func (i *IDTokenHandleHelper) GetAccessTokenHash(ctx context.Context, requester 
 	return base64.RawURLEncoding.EncodeToString(hashBuf.Bytes()[:len/2])
 }
 
-func (i *IDTokenHandleHelper) generateIDToken(ctx context.Context, fosr fosite.Requester) (token string, err error) {
-	token, err = i.IDTokenStrategy.GenerateIDToken(ctx, fosr)
+func (i *IDTokenHandleHelper) generateIDToken(ctx context.Context, fosr fosite.Requester) (token string, sig string, err error) {
+	token, sig, err = i.IDTokenStrategy.GenerateIDToken(ctx, fosr)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return token, nil
+	return token, sig, nil
 }
 
 func (i *IDTokenHandleHelper) IssueImplicitIDToken(ctx context.Context, ar fosite.Requester, resp fosite.AuthorizeResponder) error {
-	token, err := i.generateIDToken(ctx, ar)
+	token, sig, err := i.generateIDToken(ctx, ar)
 	if err != nil {
+		return err
+	}
+	if err != nil {
+		return err
+	} else if err = i.Storage.CreateOpenIDConnectSession(ctx, sig, ar); err != nil {
 		return err
 	}
 
@@ -66,8 +74,13 @@ func (i *IDTokenHandleHelper) IssueImplicitIDToken(ctx context.Context, ar fosit
 }
 
 func (i *IDTokenHandleHelper) IssueExplicitIDToken(ctx context.Context, ar fosite.Requester, resp fosite.AccessResponder) error {
-	token, err := i.generateIDToken(ctx, ar)
+	token, sig, err := i.generateIDToken(ctx, ar)
 	if err != nil {
+		return err
+	}
+	if err != nil {
+		return err
+	} else if err = i.Storage.CreateOpenIDConnectSession(ctx, sig, ar); err != nil {
 		return err
 	}
 

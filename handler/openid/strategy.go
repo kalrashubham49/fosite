@@ -28,5 +28,6 @@ import (
 )
 
 type OpenIDConnectTokenStrategy interface {
-	GenerateIDToken(ctx context.Context, requester fosite.Requester) (token string, err error)
+	GenerateIDToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
+	GenerateNewIDToken(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
 }

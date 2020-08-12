@@ -65,7 +65,6 @@ func (c *HMACStrategy) Generate() (string, string, error) {
 	encodedToken := b64.EncodeToString([]byte(token))
 
 	// Sign The Encoded token and Generate signature
-
 	signedSignature, err := signingutils.SignToken(encodedToken, c.PrivateKey)
 
 	if err != nil {
@@ -99,16 +98,12 @@ func (c *HMACStrategy) Validate(token string) (err error) {
 			return err
 		}
 	}
-
 	if err == nil {
 		return errors.New("a secret for signing HMAC-SHA256 is expected to be defined, but none were")
 	}
-
 	return err
 }
-
 func (c *HMACStrategy) validate(secret []byte, token string) error {
-
 	if len(secret) < minimumSecretLength {
 		return errors.Errorf("secret for signing HMAC-SHA256 is expected to be 32 byte long, got %d byte", len(secret))
 	}
@@ -133,7 +128,7 @@ func (c *HMACStrategy) validate(secret []byte, token string) error {
 		return errors.WithStack(err)
 	}
 
-	return signingutils.VerifySigning(&c.PrivateKey.PublicKey, token, decodedTokenSignature)
+	return signingutils.VerifySigning(&c.PrivateKey.PublicKey, tokenKey, decodedTokenSignature)
 
 	// decodedTokenKey, err := b64.DecodeString(tokenKey)
 	// if err != nil {

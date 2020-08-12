@@ -30,14 +30,16 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/kalrashubham49/fosite"
+
 	"github.com/kalrashubham49/fosite/token/jwt"
 )
 
 // DefaultJWTStrategy is a JWT RS256 strategy.
 type DefaultJWTStrategy struct {
 	jwt.JWTStrategy
-	HMACSHAStrategy *HMACSHAStrategy
-	Issuer          string
+	HMACSHAStrategy               *HMACSHAStrategy
+	HMACSHAStrategyWithoutSigning *HMACSHAStrategyWithoutSigning
+	Issuer                        string
 }
 
 func (h DefaultJWTStrategy) signature(token string) string {
@@ -92,19 +94,20 @@ func (h *DefaultJWTStrategy) ValidateJWT(ctx context.Context, tokenType fosite.T
 }
 
 func (h DefaultJWTStrategy) RefreshTokenSignature(token string) string {
-	return h.HMACSHAStrategy.RefreshTokenSignature(token)
+	return h.signature(token)
+}
+
+func (h *DefaultJWTStrategy) GenerateRefreshToken(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
+	return h.generate(ctx, fosite.RefreshToken, req)
+}
+
+func (h *DefaultJWTStrategy) ValidateRefreshToken(ctx context.Context, req fosite.Requester, token string) error {
+	_, err := h.validate(ctx, token)
+	return err
 }
 
 func (h DefaultJWTStrategy) AuthorizeCodeSignature(token string) string {
 	return h.HMACSHAStrategy.AuthorizeCodeSignature(token)
-}
-
-func (h *DefaultJWTStrategy) GenerateRefreshToken(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
-	return h.HMACSHAStrategy.GenerateRefreshToken(ctx, req)
-}
-
-func (h *DefaultJWTStrategy) ValidateRefreshToken(ctx context.Context, req fosite.Requester, token string) error {
-	return h.HMACSHAStrategy.ValidateRefreshToken(ctx, req, token)
 }
 
 func (h *DefaultJWTStrategy) GenerateAuthorizeCode(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
@@ -113,6 +116,18 @@ func (h *DefaultJWTStrategy) GenerateAuthorizeCode(ctx context.Context, req fosi
 
 func (h *DefaultJWTStrategy) ValidateAuthorizeCode(ctx context.Context, req fosite.Requester, token string) error {
 	return h.HMACSHAStrategy.ValidateAuthorizeCode(ctx, req, token)
+}
+
+func (h DefaultJWTStrategy) AuthorizeHmacSignatute(token string) string {
+	return h.HMACSHAStrategyWithoutSigning.AuthorizeCodeSignature(token)
+}
+
+func (h *DefaultJWTStrategy) GenerateAuthorizeHmacCode(ctx context.Context, req fosite.Requester) (token string, signature string, err error) {
+	return h.HMACSHAStrategyWithoutSigning.GenerateAuthorizeCode(ctx, req)
+}
+
+func (h *DefaultJWTStrategy) ValidateAuthorizeHmacCode(ctx context.Context, req fosite.Requester, token string) error {
+	return h.HMACSHAStrategyWithoutSigning.ValidateAuthorizeCode(ctx, req, token)
 }
 
 func (h *DefaultJWTStrategy) validate(ctx context.Context, token string) (t *jwtx.Token, err error) {
@@ -155,6 +170,7 @@ func (h *DefaultJWTStrategy) validate(ctx context.Context, token string) (t *jwt
 }
 
 func (h *DefaultJWTStrategy) generate(ctx context.Context, tokenType fosite.TokenType, requester fosite.Requester) (string, string, error) {
+
 	if jwtSession, ok := requester.GetSession().(JWTSessionContainer); !ok {
 		return "", "", errors.Errorf("Session must be of type JWTSessionContainer but got type: %T", requester.GetSession())
 	} else if jwtSession.GetJWTClaims() == nil {

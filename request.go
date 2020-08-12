@@ -40,6 +40,7 @@ type Request struct {
 	RequestedAudience Arguments  `json:"requestedAudience"`
 	GrantedAudience   Arguments  `json:"grantedAudience"`
 	Signature         string     `json:"signature"`
+	Active            bool       `json:"active"`
 }
 
 func NewRequest() *Request {
@@ -51,7 +52,9 @@ func NewRequest() *Request {
 		GrantedScope:      Arguments{},
 		Form:              url.Values{},
 		RequestedAt:       time.Now().UTC(),
+		Active:            true,
 	}
+
 }
 
 func (a *Request) GetID() string {
@@ -193,4 +196,8 @@ func (a *Request) Sanitize(allowedParameters []string) Requester {
 	}
 
 	return b
+}
+
+func (a *Request) isActive() bool {
+	return a.Active
 }

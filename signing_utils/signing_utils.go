@@ -32,5 +32,6 @@ func SignToken(token string, privateKey *rsa.PrivateKey) ([]byte, error) {
 
 func VerifySigning(publicKey *rsa.PublicKey, token string, signature []byte) error {
 	// VERIFY USING PUBLIC KEY
-	return rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, []byte(token), signature)
+	hashedTokenKey := sha256.Sum256([]byte(token))
+	return rsa.VerifyPKCS1v15(publicKey, crypto.SHA256, hashedTokenKey[:], signature)
 }

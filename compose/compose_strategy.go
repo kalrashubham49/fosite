@@ -31,6 +31,7 @@ import (
 )
 
 type CommonStrategy struct {
+	oauth2.CodeHmacStrategy
 	oauth2.CoreStrategy
 	openid.OpenIDConnectTokenStrategy
 	jwt.JWTStrategy
@@ -39,6 +40,19 @@ type CommonStrategy struct {
 func NewOAuth2HMACStrategy(config *Config, secret []byte, rotatedSecrets [][]byte) *oauth2.HMACSHAStrategy {
 	return &oauth2.HMACSHAStrategy{
 		Enigma: &hmac.HMACStrategy{
+			GlobalSecret:         secret,
+			RotatedGlobalSecrets: rotatedSecrets,
+			TokenEntropy:         config.GetTokenEntropy(),
+		},
+		AccessTokenLifespan:   config.GetAccessTokenLifespan(),
+		AuthorizeCodeLifespan: config.GetAuthorizeCodeLifespan(),
+		RefreshTokenLifespan:  config.GetRefreshTokenLifespan(),
+	}
+}
+
+func NewOAuth2HMACStrategyWithoutSigning(config *Config, secret []byte, rotatedSecrets [][]byte) *oauth2.HMACSHAStrategyWithoutSigning {
+	return &oauth2.HMACSHAStrategyWithoutSigning{
+		Enigma: &hmac.OldHMACStrategy{
 			GlobalSecret:         secret,
 			RotatedGlobalSecrets: rotatedSecrets,
 			TokenEntropy:         config.GetTokenEntropy(),

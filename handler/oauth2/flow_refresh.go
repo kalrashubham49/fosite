@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/pborman/uuid"
 	"github.com/pkg/errors"
 
 	"github.com/kalrashubham49/fosite"
@@ -146,7 +147,7 @@ func (c *RefreshTokenGrantHandler) PopulateTokenEndpointResponse(ctx context.Con
 	}
 
 	storeReq := requester.Sanitize([]string{})
-	storeReq.SetID(ts.GetID())
+	storeReq.SetID(uuid.New())
 
 	if err := c.TokenRevocationStorage.CreateAccessTokenSession(ctx, accessSignature, storeReq); err != nil {
 		return handleRefreshTokenEndpointResponseStorageError(ctx, true, c.TokenRevocationStorage, err)

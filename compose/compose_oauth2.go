@@ -22,6 +22,7 @@
 package compose
 
 import (
+	"github.com/kalrashubham49/fosite/customopenid"
 	"github.com/kalrashubham49/fosite/handler/oauth2"
 )
 
@@ -31,7 +32,7 @@ func OAuth2AuthorizeExplicitFactory(config *Config, storage interface{}, strateg
 	return &oauth2.AuthorizeExplicitGrantHandler{
 		AccessTokenStrategy:      strategy.(oauth2.AccessTokenStrategy),
 		RefreshTokenStrategy:     strategy.(oauth2.RefreshTokenStrategy),
-		AuthorizeCodeStrategy:    strategy.(oauth2.AuthorizeCodeStrategy),
+		AuthorizeHmacStrategy:    strategy.(oauth2.AuthorizeHmacStrategy),
 		CoreStorage:              storage.(oauth2.CoreStorage),
 		AuthCodeLifespan:         config.GetAuthorizeCodeLifespan(),
 		RefreshTokenLifespan:     config.GetRefreshTokenLifespan(),
@@ -55,6 +56,11 @@ func OAuth2ClientCredentialsGrantFactory(config *Config, storage interface{}, st
 		},
 		ScopeStrategy:            config.GetScopeStrategy(),
 		AudienceMatchingStrategy: config.GetAudienceStrategy(),
+		IDTokenHandleHelper: &customopenid.IDTokenHandleHelper{
+			IDTokenStrategy: strategy.(customopenid.OpenIDConnectTokenStrategy),
+			Storage:         storage.(customopenid.OpenIDConnectRequestStorage),
+			IDTokenLifeSpan: config.GetIDTokenLifespan(),
+		},
 	}
 }
 

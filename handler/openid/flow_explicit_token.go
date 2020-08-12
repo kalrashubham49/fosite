@@ -23,6 +23,7 @@ package openid
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
 
@@ -38,14 +39,7 @@ func (c *OpenIDConnectExplicitHandler) PopulateTokenEndpointResponse(ctx context
 		return errors.WithStack(fosite.ErrUnknownRequest)
 	}
 
-	authorize, err := c.OpenIDConnectRequestStorage.GetOpenIDConnectSession(ctx, requester.GetRequestForm().Get("code"), requester)
-	if errors.Cause(err) == ErrNoSessionFound {
-		return errors.WithStack(fosite.ErrUnknownRequest.WithDebug(err.Error()))
-	} else if err != nil {
-		return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
-	}
-
-	if !authorize.GetGrantedScopes().Has("openid") {
+	if !requester.GetGrantedScopes().Has("openid") {
 		return errors.WithStack(fosite.ErrMisconfiguration.WithDebug("An OpenID Connect session was found but the openid scope is missing, probably due to a broken code configuration."))
 	}
 
@@ -58,6 +52,8 @@ func (c *OpenIDConnectExplicitHandler) PopulateTokenEndpointResponse(ctx context
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Failed to generate id token because session must be of type fosite/handler/openid.Session."))
 	}
 
+	sess.SetExpiresAt(fosite.IDToken, time.Now().UTC().Add(c.IDTokenLifeSpan))
+
 	claims := sess.IDTokenClaims()
 	if claims.Subject == "" {
 		return errors.WithStack(fosite.ErrServerError.WithDebug("Failed to generate id token because subject is an empty string."))
@@ -65,12 +61,5 @@ func (c *OpenIDConnectExplicitHandler) PopulateTokenEndpointResponse(ctx context
 
 	claims.AccessTokenHash = c.GetAccessTokenHash(ctx, requester, responder)
 
-	// The response type `id_token` is only required when performing the implicit or hybrid flow, see:
-	// https://openid.net/specs/openid-connect-registration-1_0.html
-	//
-	// if !requester.GetClient().GetResponseTypes().Has("id_token") {
-	// 	return errors.WithStack(fosite.ErrInvalidGrant.WithDebug("The client is not allowed to use response type id_token"))
-	// }
-
-	return c.IssueExplicitIDToken(ctx, authorize, responder)
+	return c.IssueExplicitIDToken(ctx, requester, responder)
 }

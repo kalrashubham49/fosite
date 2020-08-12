@@ -32,6 +32,9 @@ type CoreStrategy interface {
 	RefreshTokenStrategy
 	AuthorizeCodeStrategy
 }
+type CodeHmacStrategy interface {
+	AuthorizeHmacStrategy
+}
 
 type JWTStrategy interface {
 	ValidateJWT(ctx context.Context, tokenType fosite.TokenType, token string) (requester fosite.Requester, err error)
@@ -53,4 +56,10 @@ type AuthorizeCodeStrategy interface {
 	AuthorizeCodeSignature(token string) string
 	GenerateAuthorizeCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
 	ValidateAuthorizeCode(ctx context.Context, requester fosite.Requester, token string) (err error)
+}
+
+type AuthorizeHmacStrategy interface {
+	AuthorizeHmacSignatute(token string) string
+	GenerateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester) (token string, signature string, err error)
+	ValidateAuthorizeHmacCode(ctx context.Context, requester fosite.Requester, token string) (err error)
 }

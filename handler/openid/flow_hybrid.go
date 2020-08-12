@@ -90,7 +90,7 @@ func (c *OpenIDConnectHybridHandler) HandleAuthorizeEndpointRequest(ctx context.
 			return errors.WithStack(fosite.ErrInvalidGrant.WithHint("The OAuth 2.0 Client is not allowed to use authorization grant \"authorization_code\"."))
 		}
 
-		code, signature, err := c.AuthorizeExplicitGrantHandler.AuthorizeCodeStrategy.GenerateAuthorizeCode(ctx, ar)
+		code, signature, err := c.AuthorizeExplicitGrantHandler.AuthorizeHmacStrategy.GenerateAuthorizeHmacCode(ctx, ar)
 		if err != nil {
 			return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
 		}
@@ -117,11 +117,6 @@ func (c *OpenIDConnectHybridHandler) HandleAuthorizeEndpointRequest(ctx context.
 		}
 		claims.CodeHash = base64.RawURLEncoding.EncodeToString([]byte(hash[:c.Enigma.GetSigningMethodLength()/2]))
 
-		if ar.GetGrantedScopes().Has("openid") {
-			if err := c.OpenIDConnectRequestStorage.CreateOpenIDConnectSession(ctx, resp.GetCode(), ar.Sanitize(oidcParameters)); err != nil {
-				return errors.WithStack(fosite.ErrServerError.WithDebug(err.Error()))
-			}
-		}
 	}
 
 	if ar.GetResponseTypes().Has("token") {
